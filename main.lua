@@ -20,16 +20,14 @@ local Window = Rayfield:CreateWindow({
 -- ========== TAB 1: Train Your Fish To Race ==========
 local TrainTab = Window:CreateTab("🏁 Fish Race", 4483362458)
 
--- Section for remote info
+-- Section 1: Infinite Power
 TrainTab:CreateSection("⚡ Infinite Power")
-
 TrainTab:CreateLabel("Spams [C-S]PlayerTrySceneTrain with arg '2'")
 TrainTab:CreateParagraph({
    Title = "How it works",
    Content = "Fires the remote every frame (no delay) when toggled ON. Turn OFF to stop instantly."
 })
 
--- Remote
 local FishRemote = game:GetService("ReplicatedStorage")
    :WaitForChild("Remotes")
    :WaitForChild("Event")
@@ -62,7 +60,50 @@ TrainTab:CreateToggle({
    end
 })
 
-TrainTab:CreateLabel("") -- spacer
+-- Section 2: Auto Hatch
+TrainTab:CreateSection("🥚 Auto Hatch")
+TrainTab:CreateLabel("Opens best eggs continuously")
+TrainTab:CreateParagraph({
+   Title = "Auto Hatch Best Egg",
+   Content = "Spams [C-S]PlayerTryOpenEgg with World1_4_1 and World1_4_2. Turn ON to auto-hatch."
+})
+
+local HatchRemote = game:GetService("ReplicatedStorage")
+   :WaitForChild("Remotes")
+   :WaitForChild("Event")
+   :WaitForChild("Luck")
+   :WaitForChild("[C-S]PlayerTryOpenEgg")
+
+local spammingHatch = false
+local hatchConnection
+
+TrainTab:CreateToggle({
+   Name = "Auto Hatch Best Egg",
+   CurrentValue = false,
+   Flag = "AutoHatch",
+   Callback = function(Value)
+      spammingHatch = Value
+      if spammingHatch then
+         hatchConnection = game:GetService("RunService").Heartbeat:Connect(function()
+            if spammingHatch then
+               pcall(function()
+                  HatchRemote:FireServer(1, "Egg4", {
+                     World1_4_1 = true,
+                     World1_4_2 = true
+                  })
+               end)
+            end
+         end)
+      else
+         if hatchConnection then
+            hatchConnection:Disconnect()
+            hatchConnection = nil
+         end
+      end
+   end
+})
+
+TrainTab:CreateLabel("")
 TrainTab:CreateLabel("🎮 Game: Train Your Fish To Race")
 TrainTab:CreateLabel("🔧 Status: Active & Undetected")
 
@@ -70,7 +111,6 @@ TrainTab:CreateLabel("🔧 Status: Active & Undetected")
 local EvolveTab = Window:CreateTab("📈 Speed Evolve", 4483362458)
 
 EvolveTab:CreateSection("⚡ Infinite Speed Lvl")
-
 EvolveTab:CreateLabel("Spams AddSpeedRemoteEvent every frame")
 EvolveTab:CreateParagraph({
    Title = "How it works",
@@ -109,6 +149,6 @@ EvolveTab:CreateToggle({
    end
 })
 
-EvolveTab:CreateLabel("") -- spacer
+EvolveTab:CreateLabel("")
 EvolveTab:CreateLabel("🎮 Game: +1 Speed Evolve")
 EvolveTab:CreateLabel("🔧 Status: Active & Undetected")
